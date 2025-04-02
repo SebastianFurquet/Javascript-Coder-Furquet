@@ -50,7 +50,7 @@
         <div class="container">
             <div class="row">
                 <!-- Tipo de daños -->
-                <div class= " card text-bg-primary col-3 mb-3 p-1 border-light">
+                <div class= " card text-bg-primary col-12 col-md-3 mb-3 p-1 border-light">
                     <h4 class="card-header "> Daños</h4>
                     <div class="card-body text-bg-light  ">
                         <label for="selectDanio" class = "card-title"> Tipo de daño:</label>
@@ -63,10 +63,10 @@
                     </div>
                 </div>
                 <!-- Magnitud de los daños --> 
-                <div class= " card text-bg-primary col-3 mb-3 p-1 border-light">
+                <div class= " card text-bg-primary col-12 col-md-3 mb-3 p-1 border-light">
                     <h4 class="card-header ">Magnitud</h4>
                     <div class="card-body text-bg-light  ">
-                        <label for="selectMagnitud"> Magnitud de daño:</label>
+                        <label for="selectMagnitud" class = "card-title"> Magnitud de daño:</label>
                         <select id="selectMagnitud" class="form-select" aria-label="Default select example">
                             <option selected disabled value="">Seleccione Magnitud</option>
                             <option value="leve">Leve</option>
@@ -77,24 +77,24 @@
                     </div>
                 </div>
                 <!-- Repuestos --> 
-                <div class= "card text-bg-primary col-3 mb-3 p-1 border-light">
+                <div class= "card text-bg-primary col-12 col-md-3 mb-3 p-1 border-light">
                     <h4 class="card-header ">Repuesto</h4>
                     <div class="card-body text-bg-light">
-                        <label for="selectRepuesto"> Seleccione repuesto:</label>
+                        <label for="selectRepuesto" class = "card-title"> Seleccione repuesto:</label>
                         <select id="selectRepuesto" class="form-select" aria-label="Default select example">
                             <option selected disabled value="">Seleccione Repuesto</option>
                         </select> 
                     </div>
                 </div>
                 <!-- Boton Agregar Daño -->
-                <div class="d-flex col-3 mb-3 d-md-flex justify-content-md-center align-items-md-center">
+                <div class="d-flex col-12 col-md-3 mb-3 d-md-flex justify-content-md-center align-items-md-center">
                     <button id="agregarDanio" class="btn btn-primary btn-lg" type="button" > Agregar daño</button>
                 </div>
             </div>
                 <!-- Lista de daños -->
                 <div class="container">
                     <div class="row">
-                        <div id="listaDanios" class="mt-4 col-4"></div>
+                        <div id="listaDanios" class="mt-4 col-12 col-md-3"></div>
                     </div>
                 </div>
                 <!-- Cotizacion total -->

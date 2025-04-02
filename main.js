@@ -201,8 +201,8 @@ agregarDanio.addEventListener("click", ()=> {
         
 
         let tarjeta = `
-            <div class="card">
-                <div class="card-header border border-black bg-info text-white">
+            <div class="card ">
+                <div class="card-header border border-black bg-info text-white ">
                     <h3> Daños ingresados:</h3>
                 </div>
                 <ul class="list-group list-group-flush">
