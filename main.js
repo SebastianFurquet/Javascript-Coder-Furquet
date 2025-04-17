@@ -1,3 +1,12 @@
+//Se inicializa variable para cotizacion donde se iran cargando los datos
+
+let cotizacionActual ={
+    marca: "",
+    modelo: "",
+    capital: 0,
+    danios: [] // <-- esto sera mi nueva listaDanios
+};
+
 // Lista de Modelos por Marca
 
 const modelosPorMarca = {
@@ -13,7 +22,7 @@ const modelosPorMarca = {
 // Cargar modelos segun la marca seleccionada
 function cargarModelos() {
     const marcaSeleccionada = document.getElementById("marca").value;
-    localStorage.setItem("marca", marcaSeleccionada);
+    cotizacionActual.marca = marcaSeleccionada
 
     const modeloSelect = document.getElementById("modelo");
     modeloSelect.innerHTML = '<option value="">Seleccione un modelo...</option>'; 
@@ -28,19 +37,19 @@ function cargarModelos() {
     }
 }
 
-// guardo los Modelos en LocalStorage
+// guardo el modelo Selccionado en cotizacionActual
 const modeloSelect = document.getElementById("modelo")
 modeloSelect.addEventListener("change", ()=>{
     const modeloSeleccionado = modeloSelect.value;
-    localStorage.setItem("modelo", modeloSeleccionado);
+    cotizacionActual.modelo = modeloSeleccionado
 })
 
-// guardo el capital asegurado en LocalStorage
+// guardo el capital asegurado cotizacionActual
 let capitalGuardado = document.getElementById("capitalAsegurado")
 capitalGuardado.addEventListener("change", ()=> {
     const valor = parseFloat(capitalGuardado.value)
-    if (!isNaN(valor) && valor > 0){
-        localStorage.setItem("CapitalAsegurado", valor)
+    if (!isNaN(valor) && valor > 0){ 
+    cotizacionActual.capital = valor
     }
 })
 
@@ -137,8 +146,6 @@ window.addEventListener("DOMContentLoaded", () => {
 
 // Evento: Agregar daño
 
-let listaDanios = []
-
 const agregarDanio = document.getElementById("agregarDanio")
 agregarDanio.addEventListener("click", ()=> {
 
@@ -173,8 +180,7 @@ agregarDanio.addEventListener("click", ()=> {
         repuesto: repuestoSeleccionado
     }
 
-    listaDanios.push(nuevoDanio)
-    localStorage.setItem("danios", JSON.stringify(listaDanios))
+    cotizacionActual.danios.push(nuevoDanio) // <-- Agrego el nuevo daño a la cotizacion actual
     
     mostrarDanios()
 
@@ -208,7 +214,7 @@ agregarDanio.addEventListener("click", ()=> {
                 <ul class="list-group list-group-flush">
         `;
     
-        listaDanios.forEach((danio, i) => {
+        cotizacionActual.danios.forEach((danio, i) => {
             tarjeta += `
                 <li class="list-group-item">
                     <strong>Daño ${i + 1}:</strong> ${danio.tipo} (${danio.magnitud})
@@ -276,7 +282,7 @@ const calcularTotal = document.getElementById("calcularTotal")
         }, 3000);
         return;
     }
-    const totalCotizado = listaDanios.reduce((suma,danio)=> suma + danio.costo, 0);
+    const totalCotizado = cotizacionActual.danios.reduce((suma,danio)=> suma + danio.costo, 0);
 
     let mensaje
 
@@ -296,14 +302,13 @@ mostrarResultadoFinal(mensaje)
 // Funcion para mostrar el resultado Final.
 
 function mostrarResultadoFinal(mensaje, tipo = "info") {
-    const marca = localStorage.getItem("marca") || "No seleccionada";
-    const modelo = localStorage.getItem("modelo") || "No seleccionado";
-    const capital = localStorage.getItem("CapitalAsegurado") || "No ingresado";
 
-    let totalCotizado = listaDanios.reduce((suma, danio) => suma + danio.costo, 0);
+    const { marca ,modelo, capital} = cotizacionActual; 
+
+    let totalCotizado = cotizacionActual.danios.reduce((suma, danio) => suma + danio.costo, 0);
 
     // Armamos la lista de daños en HTML
-    let daniosHTML = listaDanios.map((danio, i) => { 
+    let daniosHTML = cotizacionActual.danios.map((danio, i) => { 
         return `
             <li>
                 <strong>Daño ${i + 1}:</strong> ${danio.tipo} (${danio.magnitud})
@@ -322,6 +327,13 @@ function mostrarResultadoFinal(mensaje, tipo = "info") {
         cancelButtonColor: "red",
     }).then((result) => {
         if (result.isConfirmed) {
+
+            cotizacionActual.totalCotizado = totalCotizado 
+            cotizacionActual.id = Date.now() // agrego un id a la cotizacion para poder guardarla en el localstorage
+            const historial = JSON.parse(localStorage.getItem("cotizaciones")) || []; 
+            historial.push(cotizacionActual);
+            localStorage.setItem("cotizaciones", JSON.stringify(historial)); // guardo el historial de cotizaciones en el localstorage
+
             Swal.fire({
                 title: "Resumen de Cotización",
                 html: `
@@ -356,13 +368,13 @@ function mostrarResultadoFinal(mensaje, tipo = "info") {
 function reiniciarCotizacion(){
     // limpiar localstorage
 
-    localStorage.removeItem("marca");
-    localStorage.removeItem("modelo");
-    localStorage.removeItem("CapitalAsegurado");
-    localStorage.removeItem("danios");
+    cotizacionActual = { 
+        marca:"", 
+        modelo:"", 
+        capital:0, 
+        danios:[] 
+    };
 
-    // Limpiar variables
-    listaDanios = [];
 
     // Limpiar campos del DOM
     document.getElementById("marca").value = "";
