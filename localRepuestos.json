@@ -1,0 +1,19 @@
+{
+    "repuestos": [
+        { "id": 1, "descripcion": "paragolpes", "precio": 20000 },
+        { "id": 2, "descripcion": "guardabarros", "precio": 15000 },
+        { "id": 3, "descripcion": "optica", "precio": 18000 },
+        { "id": 4, "descripcion": "capot", "precio": 30000 },
+        { "id": 5, "descripcion": "puerta Der", "precio": 40000 },
+        { "id": 6, "descripcion": "puerta Izq", "precio": 40000 },
+        { "id": 7, "descripcion": "parabrisas", "precio": 25000 },
+        { "id": 8, "descripcion": "espejo retrovisor", "precio": 10000 },
+        { "id": 9, "descripcion": "faro trasero", "precio": 16000 },
+        { "id": 10, "descripcion": "radiador", "precio": 28000 },
+        { "id": 11, "descripcion": "motor limpiaparabrisas", "precio": 12000 },
+        { "id": 12, "descripcion": "guardaplast", "precio": 8000 },
+        { "id": 13, "descripcion": "aleta delantera", "precio": 17000 },
+        { "id": 14, "descripcion": "baúl", "precio": 35000 },
+        { "id": 15, "descripcion": "llanta", "precio": 22000 }
+    ]
+}

@@ -68,44 +68,51 @@ const magnitudesDanio = [
     { magnitud: "cambio", incremento: 1 }
 ]
 
-const baseRepuestos = [
-    { descripcion: "paragolpes", precio: 20000 },
-    { descripcion: "guardabarros", precio: 15000 },
-    { descripcion: "optica", precio: 18000 },
-    { descripcion: "capot", precio: 30000 },
-    { descripcion: "puerta Der", precio: 40000 }
-]
-
 // Repuestos
+// ---------------------------------------------------------------
+// Se genera el consumo de repuestos desde Json o Api.
+// se crea api en jsonbin.io y se obtiene el link de la api https://api.jsonbin.io/v3/b/68026beb8a456b79668c515c
+// por las dudas tambien se crea el json local (LocalRepuestos.json) para no depender de la api externa.
+// ---------------------------------------------------------------
 
-//Me fijo si tengo repuestos guardados.
-if (obtenerRepuestos().length === 0) { 
-    baseRepuestos.forEach(repuesto => guardarRepuesto(repuesto));
-}
+// Carga de repuestos al localstorage desde el Json local o desde la Api jsonbin.io
 
-//Guardo repuestos como Json en localStorage
-function guardarRepuesto(repuesto){
-    let repuestosGuardados = localStorage.getItem("repuestos");
-    let listaDeRepuestos = repuestosGuardados ? JSON.parse(repuestosGuardados) : []; // operador ternario
+function cargarRepuestos(){
 
-    listaDeRepuestos.push(repuesto) 
-    let listaComoTexto = JSON.stringify(listaDeRepuestos)
-    localStorage.setItem("repuestos", listaComoTexto)
+    return fetch("https://api.jsonbin.io/v3/b/68026beb8a456b79668c515c")
+    .then(respuesta => respuesta.json())
+    .then(data => {
+        const repuestos = data.record.repuestos // valido si consumo el Json de la Api jsonbin.io
+        localStorage.setItem("repuestos", JSON.stringify(repuestos))
+        cargarRepuestosHTML()
+    })
+    .catch( ()=> { // por llega a fallar la Api jsonbin.io que es gratuita y tiene un limite de consumo manejo el error con el Catch para tomar los datos del localRepuestos.json
+        fetch("localRepuestos.json")
+        .then(respuesta => respuesta.json())
+        .then(data => {
+            const repuestos = data.repuestos
+            localStorage.setItem("repuestos", JSON.stringify(repuestos))
+            cargarRepuestosHTML();
+        })
+    })
 }
 
 //------------------------
 // Lista de repuestos.!!!!
 //-----------------------
 
+// Voy a buscar la lista de los repuestos al LocalStorage.
+
 function obtenerRepuestos(){
     let repuestosGuardados = localStorage.getItem("repuestos");
     if(!repuestosGuardados) {
         return [];  
     } 
-
     let listaDeRepuestos = JSON.parse(repuestosGuardados);
     return listaDeRepuestos;
 }
+
+// Cargo los repuestos en el Select del Html.
 
 function cargarRepuestosHTML(){
     const repuestos = obtenerRepuestos()
@@ -120,7 +127,8 @@ function cargarRepuestosHTML(){
         select.appendChild(opcion);
     })
 }
-cargarRepuestosHTML()
+
+// Habilito los repuestos segun la condicion seleccionada Daño : ROTO Y Magnitud : CAMBIO
 
 function habilitaRepuestos() {
     const tiposDanio = document.getElementById("selectDanio").value;
@@ -137,11 +145,19 @@ function habilitaRepuestos() {
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-    document.getElementById("selectDanio").addEventListener("change", habilitaRepuestos);
-    document.getElementById("selectMagnitud").addEventListener("change", habilitaRepuestos);
-
-    habilitaRepuestos(); //  por si hay valores ya seleccionados
+    cargarRepuestos()
+    .then ( ()=> {
+        document.getElementById("selectDanio").addEventListener("change", habilitaRepuestos);
+        document.getElementById("selectMagnitud").addEventListener("change", habilitaRepuestos);
+    
+        habilitaRepuestos(); //  por si hay valores ya seleccionados
+    })
+    .catch(error => {
+        console.error("Error al cargar los repuestos: ", error);
+        Swal.fire("Error", "No se pudieron cargar los repuestos", "error")
+    })
 });
+
 
 
 // Evento: Agregar daño
@@ -194,14 +210,6 @@ agregarDanio.addEventListener("click", ()=> {
 
 // Mostrar daños en el DOM
 
-/* function mostrarDanios() {
-    const divDanios = document.getElementById("listaDanios")
-    divDanios.innerHTML = "<h3> Daños ingresados:</h3>"
-    listaDanios.forEach((danio,i)=>{
-        divDanios.innerHTML += `<p> Daño ${i + 1}: ${danio.tipo} (${danio.magnitud}) ${danio.repuesto ? ' con repuesto: ' + danio.repuesto : ''} - $${danio.costo} </p>`
-    })
-} */
-
     function mostrarDanios() {
         const divDanios = document.getElementById("listaDanios");
         
@@ -244,20 +252,6 @@ function mostrarAlerta(){
     })
 }
 
-/* function mostrarAlerta(mensaje, tipo = "success") {
-    const divAlerta = document.getElementById("alertaDanio");
-
-    divAlerta.innerHTML = `
-        <div class="alert alert-${tipo} alert-dismissible fade show "" role="alert">
-            ${mensaje}
-        </div>
-    `;
-
-    setTimeout(() => {
-        divAlerta.innerHTML = "";
-    }, 2000); // 2 segundos
-    
-} */
 
 // Evento Calcular total y mostrar resultado final.
 
@@ -273,8 +267,6 @@ const calcularTotal = document.getElementById("calcularTotal")
             text: "Ingresa un valor por favor",
             icon: "error"
         });
-/*         divResultado.className = "alert alert-danger"
-        divResultado.textContent = "Capital asegurado no valido. Ingrese un valor"; */
 
         setTimeout(()=>{
             divResultado.textContent = "";
@@ -329,7 +321,7 @@ function mostrarResultadoFinal(mensaje, tipo = "info") {
         if (result.isConfirmed) {
 
             cotizacionActual.totalCotizado = totalCotizado 
-            cotizacionActual.id = Date.now() // agrego un id a la cotizacion para poder guardarla en el localstorage
+            cotizacionActual.id = Date.now() 
             const historial = JSON.parse(localStorage.getItem("cotizaciones")) || []; 
             historial.push(cotizacionActual);
             localStorage.setItem("cotizaciones", JSON.stringify(historial)); // guardo el historial de cotizaciones en el localstorage
@@ -357,8 +349,17 @@ function mostrarResultadoFinal(mensaje, tipo = "info") {
                 confirmButtonColor:"green",
                 cancelButtonColor:"violet",
                 }).then((result) =>{
-                    if(!result.isConfirmed){
-                        reiniciarCotizacion()
+                    if(result.isConfirmed){
+                        Swal.fire({
+                            title: "¡Gracias por usar el simulador!",
+                            text: "La cotización fue guardada correctamente.",
+                            icon: "success",
+                            confirmButtonText: "Aceptar"
+                        }).then(() => {
+                            reiniciarCotizacion();
+                        });
+                    } else {
+                        reiniciarCotizacion();
                     }
                 })
         }
@@ -374,7 +375,6 @@ function reiniciarCotizacion(){
         capital:0, 
         danios:[] 
     };
-
 
     // Limpiar campos del DOM
     document.getElementById("marca").value = "";
